@@ -194,6 +194,24 @@
             color: #878a8c;
         }
 
+        #play-again {
+            display: none;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #538d4e;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #play-again:hover {
+            background-color: #6aaa64;
+        }
+
         .shake {
             animation: shake 0.5s;
         }
@@ -269,6 +287,8 @@
                 <button class="key wide" data-key="backspace">⌫</button>
             </div>
         </div>
+
+        <button id="play-again">Play Again</button>
 
         <div id="stats"></div>
     </div>
@@ -398,17 +418,49 @@
                 gameOver = true;
                 setTimeout(() => {
                     showMessage('Impressive!');
+                    document.getElementById('play-again').style.display = 'block';
                 }, 1500);
             } else if (currentRow === 5) {
                 gameOver = true;
                 setTimeout(() => {
                     showMessage(`The word was ${targetWord.toUpperCase()}`);
+                    document.getElementById('play-again').style.display = 'block';
                 }, 1500);
             }
 
             currentRow++;
             currentTile = 0;
             currentGuess = '';
+        }
+
+        // Reset game for new round
+        function resetGame() {
+            // Reset game state
+            currentRow = 0;
+            currentTile = 0;
+            gameOver = false;
+            currentGuess = '';
+            
+            // Clear board
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.getElementById(`tile-${i}-${j}`);
+                    tile.textContent = '';
+                    tile.className = 'tile';
+                }
+            }
+            
+            // Reset keyboard
+            document.querySelectorAll('.key').forEach(key => {
+                key.classList.remove('correct', 'present', 'absent');
+            });
+            
+            // Hide play again button
+            document.getElementById('play-again').style.display = 'none';
+            
+            // Pick new word
+            targetWord = answerList[Math.floor(Math.random() * answerList.length)];
+            console.log('New game started!');
         }
 
         // Flip tiles with animation
@@ -502,6 +554,18 @@
                 handleKey(key.dataset.key);
             });
         });
+
+        // Play again button
+        document.getElementById('play-again').addEventListener('click', resetGame);
+
+        // Secret console command to reveal word
+        window.revwrd = function() {
+            if (targetWord) {
+                console.log('🔓 The answer is: ' + targetWord.toUpperCase());
+            } else {
+                console.log('⏳ Game still loading...');
+            }
+        };
 
         // Initialize game
         initBoard();
